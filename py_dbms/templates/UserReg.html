@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Registration Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+        }
+        form {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background: #f9f9f9;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+        button {
+            padding: 10px;
+            width: 48%;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .back {
+            background: gray;
+            color: white;
+        }
+        .register {
+            background: blue;
+            color: white;
+        }
+        button:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>User Registration</h2>
+
+    <form action="submit_registration.php" method="POST">
+        <label for="name">Full Name:</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+
+        <label for="confirm-password">Confirm Password:</label>
+        <input type="password" id="confirm-password" name="confirm-password" required>
+
+        <label for="contact">Contact No.:</label>
+        <input type="tel" id="contact" name="contact" required>
+
+        <label>Gender:</label>
+        <select id="gender" name="gender" required>
+            <option value="">Select</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+        </select>
+
+        <label for="address">Street & Door No.:</label>
+        <input type="text" id="address" name="address" required>
+
+        <label for="city">City:</label>
+        <input type="text" id="city" name="city" required>
+
+        <label for="district">District:</label>
+        <input type="text" id="district" name="district" required>
+
+        <label for="state">State:</label>
+        <input type="text" id="state" name="state" required>
+
+        <label for="pincode">Pincode:</label>
+        <input type="text" id="pincode" name="pincode" required>
+
+        <div class="buttons">
+            <button type="button" class="back" onclick="goBack()">Back</button>
+            <button type="submit" class="register">Register</button>
+        </div>
+    </form>
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    
+        document.querySelector("form").addEventListener("submit", async function(event) {
+    event.preventDefault(); // Prevent default form submission
+
+    const formData = {
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        password: document.getElementById("password").value,
+        contact: document.getElementById("contact").value,
+        gender: document.getElementById("gender").value,
+        address: document.getElementById("address").value,
+city: document.getElementById("city").value,
+
+        district: document.getElementById("district").value,
+        state: document.getElementById("state").value,
+        pincode: document.getElementById("pincode").value
+    };
+
+    try {
+        const response = await fetch("http://localhost:8080/users/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData)
+        });
+
+        const result = await response.json();
+        alert(result.message || result.error); // Display success or error message
+        if (response.ok) {
+            // Redirect only if login is successful
+            window.location.href = "/userLogin.html"; 
+
+            // Change this to your success page
+        }
+
+    } catch (error) {
+        alert("Error registering user!");
+        console.error("Registration Error:", error);
+    }
+});
+
+    </script>
+
+</body>
+</html>

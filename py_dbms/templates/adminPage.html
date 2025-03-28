@@ -1,0 +1,259 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Page</title>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const adminEmail = localStorage.getItem("email");
+            if (!adminEmail) {
+                alert("Admin not logged in!");
+                window.location.href = "adminLogin.html";
+            }
+            document.getElementById("userName").innerText = adminEmail;
+
+            fetchProducts();
+        });
+
+        function fetchProducts() {
+            fetch("/get_products")
+                .then(response => response.json())
+                .then(data => {
+                    const productTable = document.getElementById("product-list");
+                    productTable.innerHTML = ""; // Clear previous data
+                    console.log(data);
+                    data.forEach(product => {
+                        let row = `
+                            <tr>
+                                <td>${product[5]}</td>
+                                <td>${product[2]}</td>
+                                <td>${product[3]}</td>
+                                <td>${product[6]}</td>
+                                <td>${product[7]}</td>
+                                <td>
+                                    <button onclick="showEmployeeModal(${product[0]})" class="accept">Accept</button>
+                                    <button onclick="updateStatus(${product[0]}, 'Rejected', null)" class="reject">Reject</button>
+                                </td>
+                            </tr>`;
+                        productTable.innerHTML += row;
+                    });
+                })
+                .catch(error => console.error("Error fetching products:", error));
+        }
+
+        function showEmployeeModal(productId) {
+    fetch("/get_employees")
+        .then(response => response.json())
+        .then(data => {
+            const employeeSelect = document.getElementById("employee-select");
+            const modal = document.getElementById("employeeModal");
+            const assignButton = document.getElementById("confirm-assign"); // Assign button
+
+            if (!modal || !employeeSelect || !assignButton) {
+                console.error("Modal, dropdown, or assign button not found!");
+                return;
+            }
+
+            employeeSelect.innerHTML = "";  // Clear previous options
+            console.log("Fetched Data:", data);
+            
+            if (Array.isArray(data.employees)) {
+                console.log("Valid Employees Array:", data.employees);
+
+                data.employees.forEach((employee, index) => {
+                    console.log(`Processing employee ${index}:`, employee);
+                    
+                    if (Array.isArray(employee) && employee.length > 1) {
+                        let email = employee[0];  
+                        let name = employee[1];
+
+                        let optionElement = document.createElement("option");
+                        optionElement.value = email;
+                        optionElement.textContent = `${name} (${email})`;
+                        employeeSelect.appendChild(optionElement);
+                    }
+                });
+
+                // ✅ Show the modal
+                modal.style.display = "block";
+
+                // ✅ Ensure previous event listeners are removed
+                assignButton.replaceWith(assignButton.cloneNode(true));
+                const newAssignButton = document.getElementById("confirm-assign");
+
+                // ✅ Add event listener to the "Assign" button
+                newAssignButton.addEventListener("click", function() {
+                    updateStatus(productId, "Accepted");
+                });
+            } else {
+                console.error("data.employees is not an array:", data.employees);
+            }
+        })
+        .catch(error => console.error("Error fetching employees:", error));
+}
+
+window.onclick = function(event) {
+    let modal = document.getElementById("employeeModal");
+    if (event.target === modal) {
+        modal.style.display = "none";
+    }
+};
+
+
+
+
+        function updateStatus(productId, status) {
+            const employeeId = status === "Accepted" ? document.getElementById("employee-select").value : null;
+            console.log(productId,status,employeeId);
+            fetch("/update_status", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id: productId, status: status, incharge: employeeId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                fetchProducts();
+                document.getElementById("employeeModal").style.display = "none";
+            })
+            .catch(error => console.error("Error updating status:", error));
+        }
+
+        function closeModal() {
+            document.getElementById("employeeModal").style.display = "none";
+        }
+
+        function filterProductsByDate() {
+            const selectedDate = document.getElementById('date-filter').value;
+            if (!selectedDate) return;
+
+            fetch('/get_product_date', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ date: selectedDate })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // ✅ Clear previous data
+                document.getElementById('pickup-products').innerHTML = '';
+                document.getElementById('delivery-products').innerHTML = '';
+
+                // ✅ Display Pickup Date Products
+                data.pickup.forEach(product => {
+                    document.getElementById('pickup-products').innerHTML += `
+                        <tr>
+                            <td>${product[0]}</td>
+                            <td>${product[1]}</td>
+                            <td>${product[2]}</td>
+                        </tr>
+                    `;
+                });
+
+                // ✅ Display Delivery Date Products
+                data.delivery.forEach(product => {
+                    document.getElementById('delivery-products').innerHTML += `
+                        <tr>
+                            <td>${product[0]}</td>
+                            <td>${product[1]}</td>
+                            <td>${product[2]}</td>
+                        </tr>
+                    `;
+                });
+            })
+            .catch(error => console.error('Error:', error));
+        }
+        function logout() {
+            localStorage.removeItem("email");
+            window.location.href = "adminLogin.html";
+        }
+    </script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
+        table { width: 80%; margin: auto; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .accept { background-color: #28a745; color: white; border: none; padding: 5px 10px; cursor: pointer; }
+        .reject { background-color: #dc3545; color: white; border: none; padding: 5px 10px; cursor: pointer; }
+        .accept:hover { background-color: #218838; }
+        .reject:hover { background-color: #c82333; }
+
+        /* Modal Styles */
+        .modal {
+            display: none; position: fixed; z-index: 1; left: 0; top: 0;
+            width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: white; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 50%;
+            text-align: center;
+        }
+        .close { color: red; float: right; font-size: 24px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h2>Welcome, <span id="userName"></span></h2>
+    <button onclick="window.location.href='empList.html'">Manage Employees</button>
+
+    <h2>Pending Product Requests</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Receiver Name</th>
+                <th>Receiver Contact</th>
+                <th>Pickup Date</th>
+                <th>Delivery Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="product-list">
+            <!-- Products will be displayed here dynamically -->
+        </tbody>
+    </table>
+
+    <!-- Modal for selecting employee -->
+    <div id="employeeModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3>Select Employee</h3>
+            <select id="employee-select"></select>
+            <br><br>
+            <button id="confirm-assign" class="accept">Assign</button>
+        </div>
+    </div>
+
+    <h2>Filter Products by Date</h2>
+    <input type="date" id="date-filter" onchange="filterProductsByDate()">
+
+    <h3>Products with Selected Pickup Date</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Receiver Name</th>
+                <th>Receiver Contact</th>
+            </tr>
+        </thead>
+        <tbody id="pickup-products">
+            <!-- Pickup date products will be shown here -->
+        </tbody>
+    </table>
+
+    <h3>Products with Selected Delivery Date</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Receiver Name</th>
+                <th>Receiver Contact</th>
+            </tr>
+        </thead>
+        <tbody id="delivery-products">
+            <!-- Delivery date products will be shown here -->
+        </tbody>
+    </table>
+    <hr>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+</body>
+</html>

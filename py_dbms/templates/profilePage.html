@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Page</title>
+    <script>
+document.addEventListener("DOMContentLoaded", function () {
+    const userEmail = localStorage.getItem('email');
+    if (!userEmail) {
+        alert("User not logged in!");
+        return;
+    }
+    console.log(userEmail);
+
+    fetch('http://127.0.0.1:8080/get_user_data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: userEmail })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert(data.error);
+            return;
+        }
+
+        document.getElementById('user-details').innerHTML = `
+            <p><strong>Name:</strong> ${data.user[1]}</p>
+            <p><strong>Email:</strong> ${data.user[0]}</p>
+            <p><strong>Contact:</strong> ${data.user[3]}</p>
+            <p><strong>Gender:</strong> ${data.user[4]}</p>
+            <p><strong>Address:</strong> ${data.user[5]}, ${data.user[6]}, ${data.user[7]}, ${data.user[8]}, ${data.user[9]}</p>
+        `;
+
+        const sentProductsTable = document.getElementById('sent-products');
+        sentProductsTable.innerHTML = data.sent_products.map(product => `
+            <tr>
+                <td>${product[5]}</td>
+                <td>${product[6]}</td>
+                <td>${product[7]}</td>
+                <td>${product[2]}</td>
+                <td>${product[3]}</td>
+            </tr>
+        `).join('');
+
+        
+
+    })
+    .catch(error => console.error('Error fetching user data:', error));
+});
+
+    </script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { width: 80%; margin: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>User Profile</h2>
+        <div id="user-details"></div>
+
+        <h2>Sent Products</h2>
+        <table>
+            <tr>
+                <th>Product Name</th>
+                <th>Pickup Date</th>
+                <th>Delivery Date</th>
+                <th>Receiver</th>
+                <th>Receiver Contact</th>
+            </tr>
+            <tbody id="sent-products"></tbody>
+        </table>
+
+
+    </div>
+
+</body>
+</html>
