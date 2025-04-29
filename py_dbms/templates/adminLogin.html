@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login Page</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #121212;
+      color: #ffffff;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    h2 {
+      margin-bottom: 20px;
+      font-size: 2rem;
+      color: #00ADB5;
+    }
+    form {
+      background: #1E1E1E;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0px 0px 15px rgba(0, 173, 181, 0.4);
+      width: 90%;
+      max-width: 400px;
+    }
+    label {
+      display: block;
+      margin: 15px 0 5px;
+      text-align: left;
+      font-size: 0.9rem;
+      color: #cccccc;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #333;
+      border-radius: 8px;
+      background: #2C2C2C;
+      color: #ffffff;
+      font-size: 1rem;
+    }
+    input:focus {
+      border-color: #00ADB5;
+      outline: none;
+    }
+    .buttons {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.3s ease;
+    }
+    .back {
+      background: #393E46;
+      color: #eeeeee;
+    }
+    .login {
+      background: #00ADB5;
+      color: #ffffff;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+    a.register-btn {
+      display: block;
+      margin-top: 15px;
+      color: #00ADB5;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    a.register-btn:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Admin Login</h2>
+
+  <form id="loginForm">
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required>
+
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required>
+
+    <div class="buttons">
+      <button type="button" class="back" onclick="goBack()">Back</button>
+      <button type="submit" class="login">Login</button>
+    </div>
+    <a href="/adminReg.html" class="register-btn">Back to Registration Page</a>
+  </form>
+
+  <script>
+    let email = "---";
+    function goBack() {
+      window.location.href = "/index.html";
+    }
+
+    document.getElementById("loginForm").addEventListener("submit", async function(event) {
+      event.preventDefault(); // Prevent page refresh
+
+      email = document.getElementById("email").value;
+      let password = document.getElementById("password").value;
+
+      let response = await fetch("http://127.0.0.1:8080/adminlogin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email, password })
+      });
+
+      let data = await response.json();
+      alert(data.message || data.error);
+      if (response.ok) {
+        // Redirect only if login is successful
+        localStorage.setItem("email", email);
+        window.location.href = "/adminPage.html";
+      }
+    });
+  </script>
+
+</body>
+</html>

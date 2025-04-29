@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Page</title>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const userEmail = localStorage.getItem('email');
+            if (!userEmail) {
+                alert("User not logged in!");
+                return;
+            }
+            console.log(userEmail);
+
+            fetch('http://127.0.0.1:8080/get_user_data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: userEmail })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+
+                document.getElementById('user-details').innerHTML = `
+                    <div class="profile-card">
+                        <h3>User Details</h3>
+                        <p><strong>Name:</strong> ${data.user[1]}</p>
+                        <p><strong>Email:</strong> ${data.user[0]}</p>
+                        <p><strong>Contact:</strong> ${data.user[3]}</p>
+                        <p><strong>Gender:</strong> ${data.user[4]}</p>
+                        <p><strong>Address:</strong> ${data.user[5]}, ${data.user[6]}, ${data.user[7]}, ${data.user[8]}, ${data.user[9]}</p>
+                    </div>
+                `;
+
+                const sentProductsTable = document.getElementById('sent-products');
+                sentProductsTable.innerHTML = data.sent_products.map(product => `
+                    <tr>
+                        <td>${product[5]}</td>
+                        <td>${product[6]}</td>
+                        <td>${product[7]}</td>
+                        <td>${product[2]}</td>
+                        <td>${product[3]}</td>
+                    </tr>
+                `).join('');
+            })
+            .catch(error => console.error('Error fetching user data:', error));
+        });
+    </script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f5f5f5;
+        }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            font-size: 2rem;
+            color: #333;
+            text-align: center;
+        }
+        .profile-card {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        .profile-card h3 {
+            color: #2c3e50;
+            font-size: 1.5rem;
+        }
+        .profile-card p {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+            font-size: 1rem;
+        }
+        td {
+            background-color: #fafafa;
+        }
+        tr:hover td {
+            background-color: #f0f0f0;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        .table-container table {
+            min-width: 600px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>User Profile</h2>
+        <div id="user-details"></div>
+
+        <h2>Sent Products</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Pickup Date</th>
+                        <th>Delivery Date</th>
+                        <th>Receiver</th>
+                        <th>Receiver Contact</th>
+                    </tr>
+                </thead>
+                <tbody id="sent-products"></tbody>
+            </table>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Landing Page</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #ffffff;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      padding: 50px;
+      border-radius: 15px;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      text-align: center;
+      width: 90%;
+      max-width: 400px;
+      animation: fadeIn 1.5s ease;
+    }
+    h1 {
+      margin-bottom: 10px;
+      font-size: 28px;
+      color: #00bcd4;
+    }
+    p {
+      margin-bottom: 20px;
+      font-size: 16px;
+      color: #ccc;
+    }
+    hr {
+      border: none;
+      height: 1px;
+      background: #555;
+      margin: 20px 0;
+    }
+    .btn-container {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .btn {
+      display: inline-block;
+      padding: 12px 25px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: bold;
+      background: #1f1f1f;
+      color: #00bcd4;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 8px rgba(0, 188, 212, 0.3);
+    }
+    .btn:hover {
+      transform: scale(1.08);
+      background-color: #00bcd4;
+      color: #121212;
+      box-shadow: 0 6px 12px rgba(0, 188, 212, 0.6);
+    }
+    .admin {
+      background-color: #ff5722;
+      box-shadow: 0 4px 8px rgba(255, 87, 34, 0.4);
+    }
+    .admin:hover {
+      background-color: #ff7043;
+      color: #fff;
+    }
+    .customer {
+      background-color: #4caf50;
+      box-shadow: 0 4px 8px rgba(76, 175, 80, 0.4);
+    }
+    .customer:hover {
+      background-color: #66bb6a;
+      color: #fff;
+    }
+    .employee {
+      background-color: #2196f3;
+      box-shadow: 0 4px 8px rgba(33, 150, 243, 0.4);
+    }
+    .employee:hover {
+      background-color: #42a5f5;
+      color: #fff;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Welcome to Our Portal</h1>
+    <p>Select your role to continue</p>
+    <hr>
+    <div class="btn-container">
+      <a href="adminLogin.html" class="btn admin">Admin</a>
+      <a href="userLogin.html" class="btn customer">Customer</a>
+      <a href="empLogin.html" class="btn employee">Employee</a>
+    </div>
+  </div>
+
+</body>
+</html>

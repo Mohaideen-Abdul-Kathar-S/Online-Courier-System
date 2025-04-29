@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f4f4f4;
+            text-align: center;
+        }
+        .container {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+        }
+        .icon {
+            font-size: 20px;
+            cursor: pointer;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            text-align: left;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            margin-top: 15px;
+            padding: 10px;
+            width: 100%;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .logout {
+            background: red;
+            color: white;
+        }
+        .submit {
+            background: blue;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <span class="icon" onclick="goToProfile()">👤 Profile</span>
+        <button class="logout" onclick="logout()">Logout</button>
+    </div>
+
+    <div class="container">
+        <h3>Welcome, <span id="userName"></span></h3>
+
+        <form id="productForm">
+            <label for="receiverEmail">Receiver Email:</label>
+            <input type="email" id="receiverEmail" required>
+
+            <label for="receiverName">Receiver Name:</label>
+            <input type="text" id="receiverName" required>
+
+            <label for="receiverContact">Receiver Contact No:</label>
+            <input type="tel" id="receiverContact" required>
+
+            <label for="receiverAddress">Receiver Address:</label>
+            <input type="text" id="receiverAddress" required>
+
+            <label for="productName">Product Name:</label>
+            <input type="text" id="productName" required>
+
+            <label for="pickupDate">Pickup Date:</label>
+            <input type="date" id="pickupDate" required>
+
+            <label for="deliveryDate">Delivery Date:</label>
+            <input type="date" id="deliveryDate" required>
+
+
+            <button type="submit" class="submit">Submit</button>
+        </form>
+    </div>
+
+    <script>
+        // Get user email from localStorage
+        let email = localStorage.getItem("email");
+        if (!email) {
+            alert("Unauthorized access! Redirecting to login.");
+            window.location.href = "userLogin.html"; 
+        }
+
+        document.getElementById("userName").innerText = email;
+        
+        // Redirect to Profile Page
+        function goToProfile() {
+            localStorage.setItem("email",email)
+            window.location.href = "profilePage.html";
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem("email");
+            window.location.href = "userLogin.html";
+        }
+
+        // Form submission (stores data in DB)
+        document.getElementById("productForm").addEventListener("submit", async function(event) {
+            event.preventDefault(); 
+
+            let formData = new FormData();
+            formData.append("receiverEmail", document.getElementById("receiverEmail").value);
+            formData.append("receiverName", document.getElementById("receiverName").value);
+            formData.append("receiverContact", document.getElementById("receiverContact").value);
+            formData.append("receiverAddress", document.getElementById("receiverAddress").value);
+            formData.append("productName", document.getElementById("productName").value);
+            formData.append("pickupDate", document.getElementById("pickupDate").value);
+            formData.append("deliveryDate", document.getElementById("deliveryDate").value);
+            formData.append("email",email);
+
+            console.log([...formData.entries()]);
+
+            let response = await fetch("http://127.0.0.1:8080/storeProduct", {
+                method: "POST",
+                body: formData
+            });
+
+            let data = await response.json();
+            alert(data.message || data.error);
+            if (response.ok) {
+                document.getElementById("productForm").reset();
+            }
+        });
+    </script>
+
+</body>
+</html>

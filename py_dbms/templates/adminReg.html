@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Registration Page</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        form {
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 400px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #00bcd4;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #2c2c2c;
+            color: #fff;
+        }
+        input:focus {
+            outline: none;
+            background-color: #333;
+        }
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 15px;
+            width: 48%;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .back {
+            background-color: #757575;
+            color: white;
+        }
+        .register {
+            background-color: #00bcd4;
+            color: white;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+
+    <form>
+        <h2>Admin Registration</h2>
+
+        <label for="name">Full Name</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required>
+
+        <label for="confirm-password">Confirm Password</label>
+        <input type="password" id="confirm-password" name="confirm-password" required>
+
+        <div class="buttons">
+            <button type="button" class="back" onclick="goBack()">Back</button>
+            <button type="submit" class="register">Register</button>
+        </div>
+    </form>
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+
+        document.querySelector("form").addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            const formData = {
+                name: document.getElementById("name").value,
+                email: document.getElementById("email").value,
+                password: document.getElementById("password").value,
+            };
+
+            try {
+                const response = await fetch("http://localhost:8080/admin/register", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+                alert(result.message || result.error);
+                if (response.ok) {
+                    window.location.href = "/adminLogin.html";
+                }
+            } catch (error) {
+                alert("Error registering admin!");
+                console.error("Registration Error:", error);
+            }
+        });
+    </script>
+
+</body>
+</html>
